@@ -29,6 +29,14 @@ router.options("/", (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.status(204).send();
 });
+router.options("/:id", (req, res) => {
+    // Advertise allowed methods for a single resource
+    res.header("Allow", "GET, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Methods", "GET, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Accept");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.status(204).end();
+});
 
 
 // GET all notes
@@ -122,12 +130,34 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-// GET note by ID
-router.get("/:id", async (req, res) => {
-    const noteId = req.params.id;
+// delete note by ID
+router.delete("/:id", async (req, res) => {
+    const id = req.params.id;
 
     try {
-        const note = await Note.findById(noteId);
+        const deleted = await Note.findByIdAndDelete(id);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Note not found" });
+        }
+
+        // Correct DELETE response
+        res.status(204).end();
+    } catch (err) {
+        res.status(500).json({ message: "Error deleting note" });
+    }
+});
+
+// GET note by ID
+router.get("/:id", async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const note = await Note.findById(id);
+
+        if (!note) {
+            return res.status(404).json({ message: "Note not found" });
+        }
 
         res.json(note);
     } catch (e) {
@@ -136,3 +166,4 @@ router.get("/:id", async (req, res) => {
 });
 
 export default router;
+
