@@ -89,9 +89,38 @@ router.post("/seed", async (req, res) => {
     res.json(notes);
 });
 
-// router.put("/", async (req, res) => {
-//     const noteId = req.params.id;
-//     res.status(501).json({ message: "Not implemented yet" });
+// update note by ID
+router.put("/:id", async (req, res) => {
+    const id = req.params.id;
+
+    // Validatie
+    if (!req.body.title || !req.body.body || !req.body.author) {
+        return res.status(400).json({
+            message: "Title, body and author are required"
+        });
+    }
+
+    try {
+        const updatedNote = await Note.findByIdAndUpdate(
+            id,
+            {
+                title: req.body.title,
+                body: req.body.body,
+                author: req.body.author
+            },
+            { new: true } // <-- heel belangrijk: return updated document
+        );
+
+        if (!updatedNote) {
+            return res.status(404).json({ message: "Note not found" });
+        }
+
+        res.status(200).json(updatedNote);
+
+    } catch (err) {
+        res.status(500).json({ message: "Error updating note" });
+    }
+});
 
 // GET note by ID
 router.get("/:id", async (req, res) => {
