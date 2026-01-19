@@ -24,6 +24,9 @@ router.use((req, res, next) => {
 
 router.options("/", (req, res) => {
     res.header("Allow", "GET, POST, OPTIONS");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Accept");
+    res.header("Access-Control-Allow-Origin", "*");
     res.status(204).send();
 });
 
@@ -85,6 +88,10 @@ router.post("/seed", async (req, res) => {
 
     res.json(notes);
 });
+
+// router.put("/", async (req, res) => {
+//     const noteId = req.params.id;
+//     res.status(501).json({ message: "Not implemented yet" });
 
 // GET note by ID
 router.get("/:id", async (req, res) => {
